@@ -45,7 +45,7 @@ export default function CustomersPage() {
   const [showAddCustomer, setShowAddCustomer] = useState(false);
   const [isCreatingCustomer, setIsCreatingCustomer] = useState(false);
   const [isUpdatingCustomer, setIsUpdatingCustomer] = useState<string | null>(
-    null,
+    null
   );
   const [newCustomer, setNewCustomer] = useState({
     name: "",
@@ -75,7 +75,7 @@ export default function CustomersPage() {
     if (newCustomer.name.trim()) {
       // Check if customer name already exists
       const existingCustomer = customers.find(
-        (c) => c.name.toLowerCase() === newCustomer.name.toLowerCase(),
+        (c) => c.name.toLowerCase() === newCustomer.name.toLowerCase()
       );
       if (existingCustomer) {
         alert("Customer with this name already exists");
@@ -125,7 +125,7 @@ export default function CustomersPage() {
 
   const handleUpdateCustomer = async (
     customerId: string,
-    updates: Partial<Customer>,
+    updates: Partial<Customer>
   ) => {
     setIsUpdatingCustomer(customerId);
     try {
@@ -140,7 +140,7 @@ export default function CustomersPage() {
       if (response.ok) {
         const updatedCustomer = await response.json();
         setCustomers(
-          customers.map((c) => (c._id === customerId ? updatedCustomer : c)),
+          customers.map((c) => (c._id === customerId ? updatedCustomer : c))
         );
         setEditingCustomer(null);
       } else {
@@ -162,7 +162,7 @@ export default function CustomersPage() {
   const handleDeleteCustomer = async (customerId: string) => {
     if (
       confirm(
-        "Are you sure you want to delete this customer? This action cannot be undone.",
+        "Are you sure you want to delete this customer? This action cannot be undone."
       )
     ) {
       try {
@@ -201,51 +201,6 @@ export default function CustomersPage() {
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
               Customer Management
             </h1>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
-            <div className="flex items-center gap-2">
-              <Users className="h-6 w-6 text-blue-600" />
-              <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Total
-                </p>
-                <p className="text-lg font-bold text-gray-800 dark:text-white">
-                  {customers.length}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
-            <div className="flex items-center gap-2">
-              <UserCheck className="h-6 w-6 text-green-600" />
-              <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Active
-                </p>
-                <p className="text-lg font-bold text-gray-800 dark:text-white">
-                  {activeCustomers.length}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
-            <div className="flex items-center gap-2">
-              <UserX className="h-6 w-6 text-red-600" />
-              <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Inactive
-                </p>
-                <p className="text-lg font-bold text-gray-800 dark:text-white">
-                  {inactiveCustomers.length}
-                </p>
-              </div>
-            </div>
           </div>
         </div>
 

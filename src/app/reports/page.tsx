@@ -166,7 +166,7 @@ export default function ReportsPage() {
               <SelectValue placeholder="Select customer" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Customers</SelectItem>
+              <SelectItem value="all">All</SelectItem>
               {customers
                 .filter((customer) => customer.isActive)
                 .map((customer) => (

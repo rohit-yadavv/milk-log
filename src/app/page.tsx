@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { Users, Milk, FileText, BarChart3, Settings } from "lucide-react";
+import { Users, Milk, BarChart3, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
-  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -98,92 +97,66 @@ export default function Home() {
       return sum + (morningAmount || customer?.dailyAmount || 0);
     }
   }, 0);
-  const todayDeliveredCount = todayRecords.length;
 
   const handleAddRecord = async () => {
     if (newRecord.customer) {
       const today = format(new Date(), "yyyy-MM-dd");
       const customer = newRecord.customer;
 
-      // For milkmen, at least one amount (morning or evening) is required
       if (
         customer?.customerType === "milkman" &&
         newRecord.morningAmount <= 0 &&
         newRecord.eveningAmount <= 0
       ) {
-        alert(
-          "At least one amount (morning or evening) is required for milkman deliveries",
-        );
+        alert("सुबह या शाम की मात्रा आवश्यक है");
         return;
       }
 
       setIsCreatingRecord(true);
       try {
-        if (editingRecord) {
-          const response = await fetch(`/api/records/${editingRecord._id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              customerId: customer._id,
-              date: editingRecord.date,
-              morningAmount:
-                newRecord.morningAmount > 0
-                  ? newRecord.morningAmount
-                  : customer?.customerType === "regular"
-                    ? customer.dailyAmount
-                    : undefined,
-              eveningAmount:
-                newRecord.eveningAmount > 0
-                  ? newRecord.eveningAmount
-                  : undefined,
-            }),
-          });
+        const isUpdate = !!editingRecord;
+        const url = isUpdate
+          ? `/api/records/${editingRecord._id}`
+          : "/api/records";
+        const method = isUpdate ? "PUT" : "POST";
 
-          if (response.ok) {
-            const updatedRecord = await response.json();
+        const requestBody = {
+          customerId: customer._id,
+          date: isUpdate ? editingRecord.date : today,
+          morningAmount:
+            newRecord.morningAmount > 0
+              ? newRecord.morningAmount
+              : customer?.customerType === "regular"
+              ? customer.dailyAmount
+              : undefined,
+          eveningAmount:
+            newRecord.eveningAmount > 0 ? newRecord.eveningAmount : undefined,
+        };
+
+        const response = await fetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (response.ok) {
+          const recordData = await response.json();
+
+          if (isUpdate) {
             setRecords(
-              records.map((r) =>
-                r._id === editingRecord._id ? updatedRecord : r,
-              ),
+              records.map((r) => (r._id === editingRecord._id ? recordData : r))
             );
           } else {
-            const errorData = await response.json();
-            alert(errorData.error || "Failed to update record");
-            return;
+            setRecords([...records, recordData]);
           }
         } else {
-          // Create new record
-          const response = await fetch("/api/records", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              customerId: customer._id,
-              date: today,
-              morningAmount:
-                newRecord.morningAmount > 0
-                  ? newRecord.morningAmount
-                  : customer?.customerType === "regular"
-                    ? customer.dailyAmount
-                    : undefined,
-              eveningAmount:
-                newRecord.eveningAmount > 0
-                  ? newRecord.eveningAmount
-                  : undefined,
-            }),
-          });
-
-          if (response.ok) {
-            const newRecordData = await response.json();
-            setRecords([...records, newRecordData]);
-          } else {
-            const errorData = await response.json();
-            alert(errorData.error || "Failed to add record");
-            return;
-          }
+          const errorData = await response.json();
+          alert(
+            errorData.error || `Failed to ${isUpdate ? "update" : "add"} record`
+          );
+          return;
         }
 
         setNewRecord({
@@ -224,21 +197,7 @@ export default function Home() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
-            <div className="flex items-center gap-2">
-              <Users className="h-6 w-6 text-green-600" />
-              <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Delivered
-                </p>
-                <p className="text-lg font-bold text-gray-800 dark:text-white">
-                  {todayDeliveredCount}
-                </p>
-              </div>
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 gap-3 mb-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
             <div className="flex items-center gap-2">
               <Milk className="h-6 w-6 text-blue-600" />
@@ -259,11 +218,11 @@ export default function Home() {
         <div className="mb-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-              Today's Deliveries
+              आज का दूध
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             {customers
               .filter((customer) => customer.isActive)
               .map((customer) => {
@@ -281,9 +240,9 @@ export default function Home() {
                     ? (existingRecord.morningAmount || 0) +
                       (existingRecord.eveningAmount || 0)
                     : existingRecord.morningAmount &&
-                        existingRecord.morningAmount > 0
-                      ? existingRecord.morningAmount
-                      : customer.dailyAmount
+                      existingRecord.morningAmount > 0
+                    ? existingRecord.morningAmount
+                    : customer.dailyAmount
                   : 0;
 
                 return (
@@ -324,37 +283,40 @@ export default function Home() {
                         className={`p-4 rounded-xl shadow-lg cursor-pointer transition-all duration-200 ${
                           hasRecord
                             ? "bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800"
-                            : "bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600"
+                            : "bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-200 dark:border-yellow-800 hover:border-yellow-300 dark:hover:border-yellow-600"
                         }`}
                       >
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
                             {customer.name}
                           </h3>
-                          <div
-                            className={`w-3 h-3 rounded-full ${
-                              hasRecord
-                                ? "bg-green-500"
-                                : "bg-gray-300 dark:bg-gray-600"
-                            }`}
-                          />
-                        </div>
-
-                        <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
-                          {customer.customerType === "milkman"
-                            ? "Milkman"
-                            : `${customer.dailyAmount}L daily`}
                         </div>
 
                         {hasRecord ? (
                           <div className="text-sm font-medium text-green-700 dark:text-green-300">
-                            {totalAmount > 0
-                              ? `${totalAmount}L delivered`
-                              : "No amount"}
+                            {customer.customerType === "milkman" ? (
+                              <>
+                                सुबह: {existingRecord.morningAmount || 0}L
+                                <br />
+                                शाम: {existingRecord.eveningAmount || 0}L
+                              </>
+                            ) : (
+                              `${
+                                existingRecord.morningAmount ||
+                                customer.dailyAmount
+                              }L delivered`
+                            )}
                           </div>
                         ) : (
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            Tap to add delivery
+                          <div className="text-sm font-medium text-yellow-700 dark:text-yellow-300">
+                            {customer.customerType === "milkman" ? (
+                              <div className="flex items-center gap-2 justify-between">
+                                <span>सुबह: 0L</span>
+                                <span>शाम: 0L</span>
+                              </div>
+                            ) : (
+                              `${customer.dailyAmount}L रोज़`
+                            )}
                           </div>
                         )}
                       </div>
@@ -370,11 +332,11 @@ export default function Home() {
                             </DrawerHeader>
                             {newRecord.customer.customerType === "milkman" ? (
                               <div className="space-y-2">
-                                <label htmlFor="morningAmount">Morning</label>
+                                <label htmlFor="morningAmount">सुबह</label>
                                 <input
                                   type="number"
                                   step="0.1"
-                                  placeholder="Morning Amount"
+                                  placeholder="सुबह की मात्रा"
                                   value={newRecord.morningAmount || ""}
                                   onChange={(e) =>
                                     setNewRecord({
@@ -385,11 +347,11 @@ export default function Home() {
                                   }
                                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                                 />
-                                <label htmlFor="eveningAmount">Evening</label>
+                                <label htmlFor="eveningAmount">शाम</label>
                                 <input
                                   type="number"
                                   step="0.1"
-                                  placeholder="Evening Amount"
+                                  placeholder="शाम की मात्रा"
                                   value={newRecord.eveningAmount || ""}
                                   onChange={(e) => {
                                     const eveningAmount =
@@ -408,8 +370,7 @@ export default function Home() {
                                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                                 />
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                                  At least one amount (morning or evening) is
-                                  required
+                                  सुबह या शाम की मात्रा आवश्यक है
                                 </p>
                               </div>
                             ) : (
@@ -446,11 +407,7 @@ export default function Home() {
                             className="bg-blue-600 hover:bg-blue-700"
                             disabled={isCreatingRecord}
                           >
-                            {isCreatingRecord
-                              ? "Adding..."
-                              : editingRecord
-                                ? "Update Record"
-                                : "Add Record"}
+                            {isCreatingRecord ? "जमा कर रहा है..." : "जमा करें"}
                           </Button>
                         </DrawerClose>
                       </DrawerFooter>
@@ -475,7 +432,7 @@ export default function Home() {
           <Link href="/reports" className="col-span-2">
             <Button className="w-full bg-purple-600 hover:bg-purple-700">
               <BarChart3 className="size-5" />
-              <span className="ml-2">Reports</span>
+              <span className="ml-2">Hisab</span>
             </Button>
           </Link>
         </div>
