@@ -1,25 +1,43 @@
-import type { MetadataRoute } from 'next'
- 
+import type { MetadataRoute } from 'next';
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Milk Log',
     short_name: 'Milk Log',
-    description: 'A Progressive Web App built with Next.js Milk Log',
+    description: 'Milk Log - where your milk distribution is managed, step by step',
     start_url: '/',
     display: 'standalone',
+    orientation: 'portrait-primary',
     background_color: '#ffffff',
-    theme_color: '#000000',
+    theme_color: '#4b4b4b',
+    categories: ['milk', 'distribution', 'management'],
+    lang: 'en',
+    scope: '/',
     icons: [
       {
-        src: '/icon-192x192.png',
+        src: '/web-app-manifest-192x192.png',
         sizes: '192x192',
         type: 'image/png',
+        purpose: 'any',
       },
       {
-        src: '/icon-512x512.png',
+        src: '/web-app-manifest-192x192.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+      {
+        src: '/web-app-manifest-512x512.png',
         sizes: '512x512',
         type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/web-app-manifest-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
       },
     ],
-  }
+  };
 }
