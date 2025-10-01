@@ -1,10 +1,10 @@
-# 🥛 Milk Log
+# Milk Log
 
 A simple and efficient **mobile-first** web application for managing daily milk distribution. Track deliveries to multiple customers with separate morning and evening amounts, manage different customer types (milkmen vs regular customers), and generate billing reports.
 
 **Streamlined for daily use** - Simple interface focused on essential features!
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -38,7 +38,7 @@ A simple and efficient **mobile-first** web application for managing daily milk 
 5. **Open your browser:**
    Go to [http://localhost:3000](http://localhost:3000)
 
-## 🛠️ Technical Details
+## Technical Details
 
 - **Framework**: Next.js 15 with React 19
 - **Styling**: Tailwind CSS with custom design system
