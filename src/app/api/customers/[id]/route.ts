@@ -5,11 +5,11 @@ import mongoose from 'mongoose';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     
     
@@ -39,8 +39,7 @@ export async function PUT(
     const updatedCustomer = await Customer.findByIdAndUpdate(
       id,
       {
-        ...body,
-        // Ensure dailyAmount is 0 for milkmen
+        ...body, 
         dailyAmount: body.customerType === 'milkman' ? 0 : body.dailyAmount
       },
       { new: true, runValidators: true }
@@ -58,11 +57,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    const { id } = params;
+    const { id } = await params;
     
     
     // Validate ObjectId

@@ -4,11 +4,12 @@ import { MilkRecord } from '@/lib/models';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    await MilkRecord.findByIdAndDelete(params.id);
+    const { id } = await params;
+    await MilkRecord.findByIdAndDelete(id);
     return NextResponse.json({ message: 'Record deleted successfully' });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to delete record' }, { status: 500 });
@@ -17,14 +18,15 @@ export async function DELETE(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
+    const { id } = await params;
     const body = await request.json();
     
     const record = await MilkRecord.findByIdAndUpdate(
-      params.id,
+      id,
       {
         morningAmount: body.morningAmount || undefined,
         eveningAmount: body.eveningAmount || undefined,
