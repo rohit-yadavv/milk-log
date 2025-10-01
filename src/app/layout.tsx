@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Milk Distribution Manager",
-  description: "Simple and easy milk distribution tracking for daily management",
+  description:
+    "Simple and easy milk distribution tracking for daily management",
 };
 
 export default function RootLayout({

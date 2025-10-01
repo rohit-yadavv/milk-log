@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { BarChart3, Calendar, TrendingUp, DollarSign } from 'lucide-react';
+import { useState } from "react";
+import { BarChart3, Calendar, TrendingUp, DollarSign } from "lucide-react";
 
 interface Customer {
   _id: string;
   name: string;
   phone?: string;
-  customerType: 'milkman' | 'regular';
+  customerType: "milkman" | "regular";
   dailyAmount: number;
   isActive: boolean;
 }
@@ -26,45 +26,68 @@ interface ReportsSectionProps {
   customers: Customer[];
 }
 
-export default function ReportsSection({ records, customers }: ReportsSectionProps) {
-  const [startDate, setStartDate] = useState(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
-  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+export default function ReportsSection({
+  records,
+  customers,
+}: ReportsSectionProps) {
+  const [startDate, setStartDate] = useState(
+    new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+  );
+  const [endDate, setEndDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
   const [showReports, setShowReports] = useState(false);
 
-  const filteredRecords = records.filter(record => {
+  const filteredRecords = records.filter((record) => {
     const recordDate = new Date(record.date);
     const start = new Date(startDate);
     const end = new Date(endDate);
     return recordDate >= start && recordDate <= end;
   });
 
-  const deliveredRecords = filteredRecords.filter(record => record.delivered);
+  const deliveredRecords = filteredRecords.filter((record) => record.delivered);
   const periodQuantity = deliveredRecords.reduce((sum, record) => {
-    const customer = customers.find(c => c._id === record.customerId);
+    const customer = customers.find((c) => c._id === record.customerId);
     return sum + (customer?.dailyAmount || 0);
   }, 0);
   const periodDeliveredCount = deliveredRecords.length;
-  const averageDaily = periodQuantity / Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)));
+  const averageDaily =
+    periodQuantity /
+    Math.max(
+      1,
+      Math.ceil(
+        (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+          (1000 * 60 * 60 * 24),
+      ),
+    );
 
   // Group records by date for daily breakdown
-  const dailyBreakdown = filteredRecords.reduce((acc, record) => {
-    const date = record.date;
-    if (!acc[date]) {
-      acc[date] = { quantity: 0, deliveredCount: 0, totalCount: 0 };
-    }
-    if (record.delivered) {
-      const customer = customers.find(c => c._id === record.customerId);
-      acc[date].quantity += customer?.dailyAmount || 0;
-      acc[date].deliveredCount += 1;
-    }
-    acc[date].totalCount += 1;
-    return acc;
-  }, {} as Record<string, { quantity: number; deliveredCount: number; totalCount: number }>);
+  const dailyBreakdown = filteredRecords.reduce(
+    (acc, record) => {
+      const date = record.date;
+      if (!acc[date]) {
+        acc[date] = { quantity: 0, deliveredCount: 0, totalCount: 0 };
+      }
+      if (record.delivered) {
+        const customer = customers.find((c) => c._id === record.customerId);
+        acc[date].quantity += customer?.dailyAmount || 0;
+        acc[date].deliveredCount += 1;
+      }
+      acc[date].totalCount += 1;
+      return acc;
+    },
+    {} as Record<
+      string,
+      { quantity: number; deliveredCount: number; totalCount: number }
+    >,
+  );
 
-  const dailyData = Object.entries(dailyBreakdown).map(([date, data]) => ({
-    date,
-    ...data
-  })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const dailyData = Object.entries(dailyBreakdown)
+    .map(([date, data]) => ({
+      date,
+      ...data,
+    }))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   return (
     <div className="space-y-4">
@@ -97,7 +120,7 @@ export default function ReportsSection({ records, customers }: ReportsSectionPro
           </div>
           <p className="text-lg font-bold">{periodQuantity.toFixed(1)}L</p>
         </div>
-        
+
         <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-3 text-white">
           <div className="flex items-center gap-1 mb-1">
             <DollarSign className="h-4 w-4" />
@@ -111,18 +134,27 @@ export default function ReportsSection({ records, customers }: ReportsSectionPro
       <div className="bg-purple-100 dark:bg-purple-900/20 rounded-lg p-3">
         <div className="flex items-center gap-1 mb-1">
           <span className="text-purple-600">📊</span>
-          <span className="text-xs font-medium text-purple-700 dark:text-purple-300">Average Daily</span>
+          <span className="text-xs font-medium text-purple-700 dark:text-purple-300">
+            Average Daily
+          </span>
         </div>
-        <p className="text-lg font-bold text-purple-800 dark:text-purple-200">{averageDaily.toFixed(1)}L</p>
+        <p className="text-lg font-bold text-purple-800 dark:text-purple-200">
+          {averageDaily.toFixed(1)}L
+        </p>
       </div>
 
       {/* Daily Breakdown */}
       {dailyData.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-3">Daily Breakdown</h3>
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-3">
+            Daily Breakdown
+          </h3>
           <div className="space-y-2">
             {dailyData.map((day) => (
-              <div key={day.date} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+              <div
+                key={day.date}
+                className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3"
+              >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
                     {new Date(day.date).toLocaleDateString()}
@@ -133,7 +165,9 @@ export default function ReportsSection({ records, customers }: ReportsSectionPro
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="text-center">
-                    <div className="text-gray-600 dark:text-gray-400">Total Customers</div>
+                    <div className="text-gray-600 dark:text-gray-400">
+                      Total Customers
+                    </div>
                     <div className="font-medium">{day.totalCount}</div>
                   </div>
                   <div className="text-center">
@@ -156,4 +190,3 @@ export default function ReportsSection({ records, customers }: ReportsSectionPro
     </div>
   );
 }
-

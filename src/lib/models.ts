@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-// Customer Schema 
+// Customer Schema
 export interface ICustomer extends Document {
   name: string;
   customerType: "milkman" | "regular";
@@ -23,7 +23,7 @@ const customerSchema = new Schema<ICustomer>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Milk Record Schema
@@ -49,7 +49,7 @@ const milkRecordSchema = new Schema<IMilkRecord>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Create models

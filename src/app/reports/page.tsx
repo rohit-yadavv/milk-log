@@ -40,7 +40,7 @@ export default function ReportsPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [records, setRecords] = useState<MilkRecord[]>([]);
   const [startDate, setStartDate] = useState(
-    format(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), "yyyy-MM-dd")
+    format(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
   );
   const [endDate, setEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [selectedCustomer, setSelectedCustomer] = useState<string>("all");
@@ -206,7 +206,7 @@ export default function ReportsPage() {
                   {filteredRecords
                     .sort(
                       (a, b) =>
-                        new Date(b.date).getTime() - new Date(a.date).getTime()
+                        new Date(b.date).getTime() - new Date(a.date).getTime(),
                     )
                     .map((record) => {
                       const customer =

@@ -112,7 +112,7 @@ export default function Home() {
         newRecord.eveningAmount <= 0
       ) {
         alert(
-          "At least one amount (morning or evening) is required for milkman deliveries"
+          "At least one amount (morning or evening) is required for milkman deliveries",
         );
         return;
       }
@@ -132,8 +132,8 @@ export default function Home() {
                 newRecord.morningAmount > 0
                   ? newRecord.morningAmount
                   : customer?.customerType === "regular"
-                  ? customer.dailyAmount
-                  : undefined,
+                    ? customer.dailyAmount
+                    : undefined,
               eveningAmount:
                 newRecord.eveningAmount > 0
                   ? newRecord.eveningAmount
@@ -145,8 +145,8 @@ export default function Home() {
             const updatedRecord = await response.json();
             setRecords(
               records.map((r) =>
-                r._id === editingRecord._id ? updatedRecord : r
-              )
+                r._id === editingRecord._id ? updatedRecord : r,
+              ),
             );
           } else {
             const errorData = await response.json();
@@ -167,8 +167,8 @@ export default function Home() {
                 newRecord.morningAmount > 0
                   ? newRecord.morningAmount
                   : customer?.customerType === "regular"
-                  ? customer.dailyAmount
-                  : undefined,
+                    ? customer.dailyAmount
+                    : undefined,
               eveningAmount:
                 newRecord.eveningAmount > 0
                   ? newRecord.eveningAmount
@@ -281,9 +281,9 @@ export default function Home() {
                     ? (existingRecord.morningAmount || 0) +
                       (existingRecord.eveningAmount || 0)
                     : existingRecord.morningAmount &&
-                      existingRecord.morningAmount > 0
-                    ? existingRecord.morningAmount
-                    : customer.dailyAmount
+                        existingRecord.morningAmount > 0
+                      ? existingRecord.morningAmount
+                      : customer.dailyAmount
                   : 0;
 
                 return (
@@ -449,8 +449,8 @@ export default function Home() {
                             {isCreatingRecord
                               ? "Adding..."
                               : editingRecord
-                              ? "Update Record"
-                              : "Add Record"}
+                                ? "Update Record"
+                                : "Add Record"}
                           </Button>
                         </DrawerClose>
                       </DrawerFooter>

@@ -1,7 +1,7 @@
 export interface Customer {
   _id: string;
   name: string;
-  customerType: 'milkman' | 'regular';
+  customerType: "milkman" | "regular";
   dailyAmount: number; // fixed daily amount in liters
   isActive: boolean;
   createdAt: string;
